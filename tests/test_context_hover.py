@@ -20,3 +20,11 @@ def test_expression_precedes_noun_detail():
  meanings=MeaningResolver().word_meanings(tokens,[expression]); hover=HoverBuilder(MatchResolver()).build(tokens,[expression],meanings)
  assert hover[0].primary_expressions[0].canonical=="jemandem einen Gefallen tun"
  assert hover[0].lexical_form.article=="der"
+
+
+def test_negated_expression_exposes_contextual_negative_meaning():
+ tokens=[Token(i=0,text="Gefallen",lemma="Gefallen",pos="NOUN"),Token(i=1,text="getan",lemma="tun",pos="VERB")]
+ expression=ExpressionMatch(pattern_id="nvv.gefallen_tun",canonical="jemandem einen Gefallen tun",type=ExpressionType.NOMEN_VERB,meaning_tr=["birine iyilik yapmak"],token_indices=[0,1],surface="Gefallen getan",confidence=.95,rank=100,negated=True,negation_token_indices=[2])
+ meanings=MeaningResolver().word_meanings(tokens,[expression])
+ assert expression.contextual_meaning_tr=="birine iyilik yapmamak"
+ assert meanings[0].contextual_meaning_tr=="birine iyilik yapmamak"
