@@ -33,6 +33,7 @@ class ExpressionMatch(BaseModel):
     token_indices:list[int]; surface:str; confidence:float; evidence:list[str]=Field(default_factory=list)
     grammar_hint:str|None=None; rank:float=0.0
     negated:bool=False; negation_token_indices:list[int]=Field(default_factory=list)
+    contextual_meaning_tr:str|None=None
 
 class LexicalForm(BaseModel):
     article:str|None=None; singular:str|None=None; plural:str|None=None
