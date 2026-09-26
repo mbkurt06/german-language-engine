@@ -1,7 +1,8 @@
 from __future__ import annotations
-import argparse, json
+import argparse, json, os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from .engine import GermanLanguageEngine
+from .translation import LibreTranslateProvider
 
 def make_handler(engine):
  class Handler(BaseHTTPRequestHandler):
@@ -27,8 +28,14 @@ def make_handler(engine):
   def log_message(self,format,*args): return
  return Handler
 
+def build_engine():
+ url=os.getenv("GLE_TRANSLATION_URL","").strip()
+ if not url: return GermanLanguageEngine()
+ provider=LibreTranslateProvider(url,api_key=os.getenv("GLE_TRANSLATION_API_KEY"))
+ return GermanLanguageEngine(sentence_meaning_provider=provider,lexical_meaning_provider=provider)
+
 def serve(host="127.0.0.1",port=8765):
- server=ThreadingHTTPServer((host,port),make_handler(GermanLanguageEngine()))
+ server=ThreadingHTTPServer((host,port),make_handler(build_engine()))
  print(f"German Language Engine listening on http://{host}:{port}"); server.serve_forever()
 
 def main():
