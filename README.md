@@ -22,10 +22,13 @@ text -> NLP adapter -> normalized tokens/dependencies
 
 The expression lexicon is structural data, not a list of literal strings.
 
+## UX contract: Context first, dictionary second
+When a learner hovers a token, the engine returns its connected expression(s) first, the meaning in the current sentence and a compact grammar hint next, and standalone dictionary meanings last. Nested useful analyses are preserved and ranked rather than deleted. See `docs/hover-contract.md`.
+
 ## Principles
 1. Match lemmas, not inflected surface forms.
 2. Prefer dependency structure over adjacency.
-3. Prefer the longest/highest-specificity valid expression.
+3. Rank the most informative/high-specificity expression first while preserving useful nested analyses.
 4. Treat reflexive pronouns and governed prepositions as slots.
 5. Normalize pronominal adverbs (darauf/davon/damit...) to governed prepositions.
 6. Allow active/passive, tense, mood, modal and clause-order variation.
