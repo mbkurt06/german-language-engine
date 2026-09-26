@@ -1,7 +1,10 @@
 from __future__ import annotations
+
 from enum import StrEnum
 from typing import Any
+
 from pydantic import BaseModel, Field
+
 
 class ExpressionType(StrEnum):
     IDIOM = "IDIOM"
@@ -14,6 +17,8 @@ class ExpressionType(StrEnum):
     COLLOCATION = "COLLOCATION"
     CONNECTOR = "CONNECTOR"
     FIXED_CONSTRUCTION = "FIXED_CONSTRUCTION"
+    GRAMMAR_CONSTRUCTION = "GRAMMAR_CONSTRUCTION"
+
 
 class SlotType(StrEnum):
     LEMMA = "LEMMA"
@@ -23,6 +28,7 @@ class SlotType(StrEnum):
     OBJECT = "OBJECT"
     CLAUSE = "CLAUSE"
     PRONOMINAL_ADVERB = "PRONOMINAL_ADVERB"
+
 
 class Token(BaseModel):
     i: int
@@ -34,6 +40,7 @@ class Token(BaseModel):
     head: int | None = None
     morph: dict[str, list[str]] = Field(default_factory=dict)
 
+
 class Slot(BaseModel):
     id: str
     type: SlotType
@@ -42,6 +49,7 @@ class Slot(BaseModel):
     case: list[str] = Field(default_factory=list)
     prep: str | None = None
     optional: bool = False
+
 
 class ExpressionPattern(BaseModel):
     id: str
@@ -54,7 +62,9 @@ class ExpressionPattern(BaseModel):
     priority: int = 50
     allow_passive: bool = True
     allow_flexible_order: bool = True
+    grammar_hint: str | None = None
     notes: str | None = None
+
 
 class ExpressionMatch(BaseModel):
     pattern_id: str
@@ -65,10 +75,30 @@ class ExpressionMatch(BaseModel):
     surface: str
     confidence: float
     evidence: list[str] = Field(default_factory=list)
+    grammar_hint: str | None = None
+    rank: float = 0.0
+
+
+class TokenMeaning(BaseModel):
+    token_index: int
+    lemma: str
+    contextual_meaning_tr: str | None = None
+    dictionary_meanings_tr: list[str] = Field(default_factory=list)
+
+
+class HoverAnalysis(BaseModel):
+    token_index: int
+    token: str
+    primary_expressions: list[ExpressionMatch] = Field(default_factory=list)
+    contextual_word_meaning_tr: str | None = None
+    dictionary_meanings_tr: list[str] = Field(default_factory=list)
+
 
 class Analysis(BaseModel):
     text: str
     tokens: list[Token]
     expressions: list[ExpressionMatch]
+    token_meanings: list[TokenMeaning] = Field(default_factory=list)
+    hover: dict[int, HoverAnalysis] = Field(default_factory=dict)
     unmatched_token_indices: list[int]
     metadata: dict[str, Any] = Field(default_factory=dict)
