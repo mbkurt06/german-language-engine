@@ -19,8 +19,8 @@ nlp = ["spacy>=3.8,<4"]
 dev = ["pytest>=8,<9", "ruff>=0.6,<1"]
 
 [project.scripts]
-gle = "german_language_engine.cli:main"\ngle-serve = "german_language_engine.api:main"
-
+gle = "german_language_engine.cli:main"
+gle-serve = "german_language_engine.api:main"
 [tool.hatch.build.targets.wheel]
 packages = ["src/german_language_engine"]
 
