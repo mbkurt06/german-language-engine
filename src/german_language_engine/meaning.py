@@ -16,6 +16,39 @@ SEED_WORDS={
  "was":{"meanings":["ne","neyi"]},"wir":{"meanings":["biz"]},
  "land":{"meanings":["ülke"],"noun":("das","Land","Länder")},
  "sprache":{"meanings":["dil"],"noun":("die","Sprache","Sprachen")},
+ "wort":{"meanings":["kelime","sözcük"],"noun":("das","Wort","Wörter")},
+ "frage":{"meanings":["soru"],"noun":("die","Frage","Fragen")},
+ "video":{"meanings":["video"],"noun":("das","Video","Videos")},
+ "sonne":{"meanings":["güneş"],"noun":("die","Sonne","Sonnen")},
+ "freund":{"meanings":["arkadaş","dost"],"noun":("der","Freund","Freunde")},
+ "kontext":{"meanings":["bağlam"],"noun":("der","Kontext","Kontexte")},
+ "fantasie":{"meanings":["hayal gücü","fantezi"],"noun":("die","Fantasie","Fantasien")},
+ "sponsor":{"meanings":["sponsor"],"noun":("der","Sponsor","Sponsoren")},
+ "suche":{"meanings":["arama"],"noun":("die","Suche","Suchen")},
+ "tutor":{"meanings":["özel öğretmen","eğitmen"],"noun":("der","Tutor","Tutoren")},
+ "physik":{"meanings":["fizik"],"noun":("die","Physik","Physiken")},
+ "universität":{"meanings":["üniversite"],"noun":("die","Universität","Universitäten")},
+ "ökonomie":{"meanings":["ekonomi"],"noun":("die","Ökonomie","Ökonomien")},
+ "option":{"meanings":["seçenek"],"noun":("die","Option","Optionen")},
+ "widerstand":{"meanings":["direnç","karşı koyma"],"noun":("der","Widerstand","Widerstände")},
+ "ding":{"meanings":["şey","nesne"],"noun":("das","Ding","Dinge")},
+ "stimme":{"meanings":["ses","oy"],"noun":("die","Stimme","Stimmen")},
+ "homepage":{"meanings":["ana sayfa","web sitesi"],"noun":("die","Homepage","Homepages")},
+ "erfolg":{"meanings":["başarı"],"noun":("der","Erfolg","Erfolge")},
+ "spaß":{"meanings":["eğlence","keyif"],"noun":("der","Spaß","Späße")},
+ "sprechen":{"meanings":["konuşmak"]},
+ "bedeuten":{"meanings":["anlamına gelmek"]},
+ "benutzen":{"meanings":["kullanmak"]},
+ "beantworten":{"meanings":["cevaplamak"]},
+ "studieren":{"meanings":["üniversitede okumak","öğrenim görmek"]},
+ "zeigen":{"meanings":["göstermek"]},
+ "denken":{"meanings":["düşünmek"]},
+ "schaffen":{"meanings":["başarmak","yapabilmek"]},
+ "hören":{"meanings":["duymak","dinlemek"]},
+ "schreiben":{"meanings":["yazmak"]},
+ "verbessern":{"meanings":["iyileştirmek","geliştirmek"]},
+ "finden":{"meanings":["bulmak"]},
+ "lernen":{"meanings":["öğrenmek"]},
 }
 PRONOMINAL_USAGE={
  "damit":("bununla / bunu yaparak","mit","Önceden söylenen bir nesneye, olaya veya duruma tekrar ad vermeden gönderme yapar."),
@@ -100,11 +133,24 @@ class MeaningResolver:
     if fallback: dictionary=[fallback]
    related=sorted(by_token.get(token.i,[]),key=lambda item:item.rank,reverse=True)
    contextual=(related[0].contextual_meaning_tr or (related[0].meaning_tr[0] if related[0].meaning_tr else None)) if related else (dictionary[0] if dictionary else None)
-   if not related and contextual and token.pos in {"NOUN","PROPN"} and "Plur" in token.morph.get("Number",[]):
-    contextual=self._pluralize_tr(contextual)
    lexical=None
-   if "noun" in entry:
-    article,singular,plural=entry["noun"]; lexical=LexicalForm(article=article,singular=singular,plural=plural)
+   noun_forms=entry.get("noun")
+   if noun_forms:
+    article,singular,plural=noun_forms
+    lexical=LexicalForm(article=article,singular=singular,plural=plural)
+   if not related and contextual and token.pos in {"NOUN","PROPN"}:
+    should_pluralize=False
+    if noun_forms:
+     _,singular,plural=noun_forms
+     surface=token.text.casefold()
+     if surface==plural.casefold():
+      should_pluralize=True
+     elif surface!=singular.casefold() and "Plur" in token.morph.get("Number",[]):
+      should_pluralize=True
+    elif "Plur" in token.morph.get("Number",[]):
+     should_pluralize=True
+    if should_pluralize:
+     contextual=self._pluralize_tr(contextual)
    notes=[]; low=token.text.lower()
    if low in PRONOMINAL_USAGE:
     contextual,prep,explanation=PRONOMINAL_USAGE[low]

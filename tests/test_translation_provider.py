@@ -74,3 +74,42 @@ def test_lexical_provider_is_not_used_for_function_words():
     assert result.hover[3].contextual_word_meaning_tr == "aptallık"
     assert "sein" not in provider.calls
     assert "ein" not in provider.calls
+
+
+class KnownNounNumberNLP:
+    def parse(self, text):
+        return [
+            Token(
+                i=0,
+                text="Wort",
+                lemma="Wort",
+                pos="NOUN",
+                morph={"Number": ["Plur"]},
+            ),
+            Token(
+                i=1,
+                text="Wörter",
+                lemma="Wort",
+                pos="NOUN",
+                morph={"Number": ["Plur"]},
+            ),
+        ]
+
+
+def test_seeded_noun_surface_overrides_false_plural_morphology():
+    provider = FakeTranslationProvider()
+    provider.values = {**provider.values, "Wort": "word"}
+    engine = GermanLanguageEngine(
+        nlp=KnownNounNumberNLP(),
+        lexical_meaning_provider=provider,
+    )
+
+    result = engine.analyze("Wort Wörter")
+
+    assert result.hover[0].contextual_word_meaning_tr == "kelime"
+    assert result.hover[0].dictionary_meanings_tr == ["kelime", "sözcük"]
+    assert result.hover[0].lexical_form.singular == "Wort"
+    assert result.hover[0].lexical_form.plural == "Wörter"
+
+    assert result.hover[1].contextual_word_meaning_tr == "kelimeler"
+    assert "Wort" not in provider.calls
