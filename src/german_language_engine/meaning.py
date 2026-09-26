@@ -19,7 +19,24 @@ PRONOMINAL_USAGE={
  "dafür":("bunun için / buna karşılık","für","Önceden söylenen bir şeye veya duruma 'für' ilişkisiyle gönderme yapar."),
 }
 class MeaningResolver:
+ def resolve_expression_meanings(self,expressions:list[ExpressionMatch])->None:
+  for expression in expressions:
+   base=expression.meaning_tr[0] if expression.meaning_tr else None
+   if not base:
+    expression.contextual_meaning_tr=None
+   elif expression.negated:
+    expression.contextual_meaning_tr=self._negate_tr(base)
+   else:
+    expression.contextual_meaning_tr=base
+
+ def _negate_tr(self,meaning:str)->str:
+  replacements=((" yapmak"," yapmamak"),(" etmek"," etmemek"),(" olmak"," olmamak"),(" almak"," almamak"),(" vermek"," vermemek"))
+  for positive,negative in replacements:
+   if meaning.endswith(positive): return meaning[:-len(positive)]+negative
+  return f"{meaning} (olumsuz)"
+
  def word_meanings(self,tokens:list[Token],expressions:list[ExpressionMatch])->list[TokenMeaning]:
+  self.resolve_expression_meanings(expressions)
   by_token={}
   for expression in expressions:
    for index in expression.token_indices: by_token.setdefault(index,[]).append(expression)
@@ -27,7 +44,7 @@ class MeaningResolver:
   for token in tokens:
    entry=SEED_WORDS.get(token.lemma.lower(),{}); dictionary=entry.get("meanings",[])
    related=sorted(by_token.get(token.i,[]),key=lambda item:item.rank,reverse=True)
-   contextual=related[0].meaning_tr[0] if related and related[0].meaning_tr else (dictionary[0] if dictionary else None)
+   contextual=(related[0].contextual_meaning_tr or (related[0].meaning_tr[0] if related[0].meaning_tr else None)) if related else (dictionary[0] if dictionary else None)
    lexical=None
    if "noun" in entry:
     article,singular,plural=entry["noun"]; lexical=LexicalForm(article=article,singular=singular,plural=plural)
