@@ -26,10 +26,8 @@ class MeaningResolver:
    base=self._realize_bound_slots(base,expression,token_map) if base else base
    if not base:
     expression.contextual_meaning_tr=None
-   elif expression.negated:
-    expression.contextual_meaning_tr=self._negate_tr(base)
    else:
-    expression.contextual_meaning_tr=base
+    expression.contextual_meaning_tr=self._realize_finite_verb(base,expression,tokens)
 
  def _realize_bound_slots(self,meaning:str,expression:ExpressionMatch,token_map:dict[int,Token])->str:
   recipient=next((slot for slot in expression.bound_slots if slot.slot_id=="recipient"),None)
@@ -43,6 +41,26 @@ class MeaningResolver:
     }.get(token.lemma.lower())
     if dative and meaning.startswith("birine "): return dative+" "+meaning[len("birine "):]
   return meaning
+
+ def _realize_finite_verb(self,meaning:str,expression:ExpressionMatch,tokens:list[Token])->str:
+  matched=set(expression.token_indices)
+  participle=next((t for t in tokens if t.i in matched and "Part" in t.morph.get("VerbForm",[])),None)
+  if not participle: return self._negate_tr(meaning) if expression.negated else meaning
+  auxiliary=next((t for t in tokens if t.pos=="AUX" and t.head is None),None)
+  if not auxiliary: return self._negate_tr(meaning) if expression.negated else meaning
+  subject=next((t for t in tokens if t.head==auxiliary.i and t.dep in {"sb","nsubj"}),None)
+  if not subject: return self._negate_tr(meaning) if expression.negated else meaning
+  person=(subject.morph.get("Person") or auxiliary.morph.get("Person") or [None])[0]
+  number=(subject.morph.get("Number") or auxiliary.morph.get("Number") or [None])[0]
+  if person=="2" and number=="Sing":
+   forms={
+    " yapmak":(" yaptın"," yapmadın")," etmek":(" ettin"," etmedin"),
+    " olmak":(" oldun"," olmadın")," almak":(" aldın"," almadın")," vermek":(" verdin"," vermedin"),
+   }
+   for infinitive,(positive,negative) in forms.items():
+    if meaning.endswith(infinitive):
+     return meaning[:-len(infinitive)]+(negative if expression.negated else positive)
+  return self._negate_tr(meaning) if expression.negated else meaning
 
  def _negate_tr(self,meaning:str)->str:
   replacements=((" yapmak"," yapmamak"),(" etmek"," etmemek"),(" olmak"," olmamak"),(" almak"," almamak"),(" vermek"," vermemek"))

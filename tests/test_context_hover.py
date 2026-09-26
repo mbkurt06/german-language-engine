@@ -45,3 +45,22 @@ def test_bound_dative_recipient_is_realized_before_negation():
  meanings=MeaningResolver().word_meanings(tokens,[expression])
  assert expression.contextual_meaning_tr=="bana iyilik yapmamak"
  assert meanings[0].contextual_meaning_tr=="bana iyilik yapmamak"
+
+
+def test_perfect_second_person_negation_is_realized_as_finite_turkish():
+ tokens=[
+  Token(i=0,text="hast",lemma="haben",pos="AUX",dep="ROOT",head=None,morph={"Person":["2"],"Number":["Sing"],"VerbForm":["Fin"]}),
+  Token(i=1,text="du",lemma="du",pos="PRON",dep="sb",head=0,morph={"Case":["Nom"],"Person":["2"],"Number":["Sing"]}),
+  Token(i=2,text="mir",lemma="mir",pos="PRON",dep="da",head=4,morph={"Case":["Dat"],"Person":["1"],"Number":["Sing"]}),
+  Token(i=3,text="Gefallen",lemma="gefallen",pos="NOUN",dep="oa",head=4,morph={"Case":["Acc"]}),
+  Token(i=4,text="getan",lemma="tun",pos="VERB",dep="oc",head=0,morph={"VerbForm":["Part"]}),
+ ]
+ expression=ExpressionMatch(
+  pattern_id="nvv.gefallen_tun",canonical="jemandem einen Gefallen tun",type=ExpressionType.NOMEN_VERB,
+  meaning_tr=["birine iyilik yapmak"],token_indices=[2,3,4],surface="mir Gefallen getan",
+  confidence=.95,rank=100,negated=True,
+  bound_slots=[BoundSlot(slot_id="recipient",token_indices=[2],surface="mir",case=["Dat"])],
+ )
+ meanings=MeaningResolver().word_meanings(tokens,[expression])
+ assert expression.contextual_meaning_tr=="bana iyilik yapmadın"
+ assert meanings[2].contextual_meaning_tr=="bana iyilik yapmadın"
