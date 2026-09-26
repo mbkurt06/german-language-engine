@@ -64,3 +64,16 @@ def test_perfect_second_person_negation_is_realized_as_finite_turkish():
  meanings=MeaningResolver().word_meanings(tokens,[expression])
  assert expression.contextual_meaning_tr=="bana iyilik yapmadın"
  assert meanings[2].contextual_meaning_tr=="bana iyilik yapmadın"
+
+
+def test_observed_subtitle_words_have_lexical_fallback():
+ tokens=[
+  Token(i=0,text="bekommen",lemma="bekommen",pos="VERB"),
+  Token(i=1,text="Rundfunkanstaltung",lemma="Rundfunkanstaltung",pos="NOUN"),
+ ]
+ meanings=MeaningResolver().word_meanings(tokens,[])
+ assert meanings[0].contextual_meaning_tr=="almak"
+ assert meanings[0].dictionary_meanings_tr==["almak","elde etmek","edinmek"]
+ assert meanings[1].contextual_meaning_tr=="yayın kuruluşu"
+ assert meanings[1].lexical_form.article=="die"
+ assert meanings[1].lexical_form.plural=="Rundfunkanstalten"
