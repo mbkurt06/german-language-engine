@@ -32,6 +32,7 @@ class ExpressionMatch(BaseModel):
     pattern_id:str; canonical:str; type:ExpressionType; meaning_tr:list[str]
     token_indices:list[int]; surface:str; confidence:float; evidence:list[str]=Field(default_factory=list)
     grammar_hint:str|None=None; rank:float=0.0
+    negated:bool=False; negation_token_indices:list[int]=Field(default_factory=list)
 
 class LexicalForm(BaseModel):
     article:str|None=None; singular:str|None=None; plural:str|None=None
