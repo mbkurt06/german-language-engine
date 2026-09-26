@@ -22,6 +22,7 @@ PRONOMINAL_USAGE={
  "daran":("buna / bunda","an","Önceden söylenen bir şeye veya duruma 'an' ilişkisiyle gönderme yapar."),
  "dafür":("bunun için / buna karşılık","für","Önceden söylenen bir şeye veya duruma 'für' ilişkisiyle gönderme yapar."),
 }
+LEXICAL_PROVIDER_POS={"NOUN","PROPN","VERB","ADJ","ADV"}
 class MeaningResolver:
  def __init__(self,lexical_provider:TranslationProvider|None=None):
   self.lexical_provider=lexical_provider or NullTranslationProvider()
@@ -83,7 +84,7 @@ class MeaningResolver:
   output=[]
   for token in tokens:
    entry=SEED_WORDS.get(token.lemma.lower(),{}); dictionary=list(entry.get("meanings",[]))
-   if not dictionary and token.pos not in {"PUNCT","SPACE"}:
+   if not dictionary and token.pos in LEXICAL_PROVIDER_POS:
     fallback=self.lexical_provider.translate(token.lemma)
     if fallback: dictionary=[fallback]
    related=sorted(by_token.get(token.i,[]),key=lambda item:item.rank,reverse=True)

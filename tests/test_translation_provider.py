@@ -17,7 +17,11 @@ class FakeTranslationProvider:
         "Propaganda Dummheit": "Propaganda, aptallık.",
     }
 
+    def __init__(self):
+        self.calls = []
+
     def translate(self, text):
+        self.calls.append(text)
         return self.values.get(text)
 
 
@@ -35,3 +39,38 @@ def test_provider_supplies_sentence_and_unknown_word_meanings():
     assert result.hover[0].contextual_word_meaning_tr == "propaganda"
     assert result.hover[1].contextual_word_meaning_tr == "aptallık"
     assert result.hover[1].dictionary_meanings_tr == ["aptallık"]
+
+
+class FunctionalWordNLP:
+    def parse(self, text):
+        return [
+            Token(i=0, text="ist", lemma="sein", pos="AUX"),
+            Token(i=1, text="eine", lemma="ein", pos="DET"),
+            Token(i=2, text="große", lemma="groß", pos="ADJ"),
+            Token(i=3, text="Dummheit", lemma="Dummheit", pos="NOUN"),
+        ]
+
+
+def test_lexical_provider_is_not_used_for_function_words():
+    provider = FakeTranslationProvider()
+    provider.values = {
+        **provider.values,
+        "sein": ":",
+        "ein": "bir biri",
+        "groß": "büyük",
+    }
+    engine = GermanLanguageEngine(
+        nlp=FunctionalWordNLP(),
+        lexical_meaning_provider=provider,
+    )
+
+    result = engine.analyze("ist eine große Dummheit")
+
+    assert result.hover[0].contextual_word_meaning_tr is None
+    assert result.hover[0].dictionary_meanings_tr == []
+    assert result.hover[1].contextual_word_meaning_tr is None
+    assert result.hover[1].dictionary_meanings_tr == []
+    assert result.hover[2].contextual_word_meaning_tr == "büyük"
+    assert result.hover[3].contextual_word_meaning_tr == "aptallık"
+    assert "sein" not in provider.calls
+    assert "ein" not in provider.calls
