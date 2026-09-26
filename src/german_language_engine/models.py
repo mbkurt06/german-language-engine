@@ -28,12 +28,16 @@ class ExpressionPattern(BaseModel):
     allow_passive:bool=True; allow_flexible_order:bool=True; grammar_hint:str|None=None
     notes:str|None=None
 
+class BoundSlot(BaseModel):
+    slot_id:str; token_indices:list[int]=Field(default_factory=list); surface:str=""; case:list[str]=Field(default_factory=list)
+
 class ExpressionMatch(BaseModel):
     pattern_id:str; canonical:str; type:ExpressionType; meaning_tr:list[str]
     token_indices:list[int]; surface:str; confidence:float; evidence:list[str]=Field(default_factory=list)
     grammar_hint:str|None=None; rank:float=0.0
     negated:bool=False; negation_token_indices:list[int]=Field(default_factory=list)
     contextual_meaning_tr:str|None=None
+    bound_slots:list[BoundSlot]=Field(default_factory=list)
 
 class LexicalForm(BaseModel):
     article:str|None=None; singular:str|None=None; plural:str|None=None
