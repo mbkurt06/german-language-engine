@@ -205,4 +205,5 @@
   grammar_hint: "+ Dat. · tun → getan"
   cefr: B1
   slots:
+    - {id: recipient, type: OBJECT, case: [Dat]}
     - {id: gefallen, type: LEMMA, lemma: Gefallen}
