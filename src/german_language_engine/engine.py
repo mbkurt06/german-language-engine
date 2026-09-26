@@ -1,5 +1,6 @@
 from __future__ import annotations
 from .context import NullSentenceMeaningProvider, SentenceMeaningProvider
+from .translation import TranslationProvider
 from .hover import HoverBuilder
 from .lexicon import ExpressionLexicon
 from .matcher import StructuralMatcher
@@ -8,9 +9,9 @@ from .models import Analysis
 from .nlp import NLPAdapter, SpacyGermanAdapter
 from .resolver import MatchResolver
 class GermanLanguageEngine:
- def __init__(self,nlp:NLPAdapter|None=None,lexicon:ExpressionLexicon|None=None,sentence_meaning_provider:SentenceMeaningProvider|None=None):
+ def __init__(self,nlp:NLPAdapter|None=None,lexicon:ExpressionLexicon|None=None,sentence_meaning_provider:SentenceMeaningProvider|None=None,lexical_meaning_provider:TranslationProvider|None=None):
   self.nlp=nlp or SpacyGermanAdapter(); self.lexicon=lexicon or ExpressionLexicon.bundled()
-  self.matcher=StructuralMatcher(); self.resolver=MatchResolver(); self.meaning_resolver=MeaningResolver()
+  self.matcher=StructuralMatcher(); self.resolver=MatchResolver(); self.meaning_resolver=MeaningResolver(lexical_meaning_provider)
   self.hover_builder=HoverBuilder(self.resolver); self.sentence_meaning_provider=sentence_meaning_provider or NullSentenceMeaningProvider()
  def analyze(self,text:str)->Analysis:
   tokens=self.nlp.parse(text); candidates=[]; seen=set()

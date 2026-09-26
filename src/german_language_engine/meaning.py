@@ -1,5 +1,6 @@
 from __future__ import annotations
 from .models import ExpressionMatch, LexicalForm, Token, TokenMeaning, UsageNote
+from .translation import NullTranslationProvider, TranslationProvider
 
 SEED_WORDS={
  "gefallen":{"meanings":["iyilik","jest"],"noun":("der","Gefallen","Gefallen")},
@@ -22,6 +23,9 @@ PRONOMINAL_USAGE={
  "dafür":("bunun için / buna karşılık","für","Önceden söylenen bir şeye veya duruma 'für' ilişkisiyle gönderme yapar."),
 }
 class MeaningResolver:
+ def __init__(self,lexical_provider:TranslationProvider|None=None):
+  self.lexical_provider=lexical_provider or NullTranslationProvider()
+
  def resolve_expression_meanings(self,tokens:list[Token],expressions:list[ExpressionMatch])->None:
   token_map={token.i:token for token in tokens}
   for expression in expressions:
@@ -78,7 +82,10 @@ class MeaningResolver:
    for index in expression.token_indices: by_token.setdefault(index,[]).append(expression)
   output=[]
   for token in tokens:
-   entry=SEED_WORDS.get(token.lemma.lower(),{}); dictionary=entry.get("meanings",[])
+   entry=SEED_WORDS.get(token.lemma.lower(),{}); dictionary=list(entry.get("meanings",[]))
+   if not dictionary and token.pos not in {"PUNCT","SPACE"}:
+    fallback=self.lexical_provider.translate(token.lemma)
+    if fallback: dictionary=[fallback]
    related=sorted(by_token.get(token.i,[]),key=lambda item:item.rank,reverse=True)
    contextual=(related[0].contextual_meaning_tr or (related[0].meaning_tr[0] if related[0].meaning_tr else None)) if related else (dictionary[0] if dictionary else None)
    lexical=None
