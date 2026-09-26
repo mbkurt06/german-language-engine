@@ -14,6 +14,8 @@ SEED_WORDS={
  "bekommen":{"meanings":["almak","elde etmek","edinmek"]},
  "rundfunkanstaltung":{"meanings":["yayın kuruluşu","radyo-televizyon kurumu"],"noun":("die","Rundfunkanstalt","Rundfunkanstalten")},
  "was":{"meanings":["ne","neyi"]},"wir":{"meanings":["biz"]},
+ "land":{"meanings":["ülke"],"noun":("das","Land","Länder")},
+ "sprache":{"meanings":["dil"],"noun":("die","Sprache","Sprachen")},
 }
 PRONOMINAL_USAGE={
  "damit":("bununla / bunu yaparak","mit","Önceden söylenen bir nesneye, olaya veya duruma tekrar ad vermeden gönderme yapar."),
