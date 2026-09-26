@@ -43,3 +43,32 @@ def test_decision_passive():
       t(2,"wurde","werden","AUX","aux",3),t(3,"getroffen","treffen","VERB","ROOT",None)
     ]
     assert M.match(toks,pattern("nvv.entscheidung_treffen"))
+
+
+def test_gefallen_tun_detects_keinen_as_negation():
+    toks=[
+      t(0,"Nein","nein","PART","ng",3), t(1,",",",","PUNCT","punct",0),
+      t(2,"damit","damit","ADV","mo",3), t(3,"hast","haben","AUX","ROOT",None),
+      t(4,"du","du","PRON","sb",3), t(5,"mir","ich","PRON","da",8,{"Case":["Dat"]}),
+      t(6,"keinen","kein","DET","nk",7,{"Case":["Acc"]}),
+      t(7,"Gefallen","gefallen","NOUN","oa",8,{"Case":["Acc"]}),
+      t(8,"getan","tun","VERB","oc",3), t(9,".",".","PUNCT","punct",3)
+    ]
+    matches=M.match(toks,pattern("nvv.gefallen_tun"))
+    assert matches
+    assert matches[0].negated is True
+    assert matches[0].negation_token_indices == [6]
+
+
+def test_gefallen_tun_positive_is_not_negated():
+    toks=[
+      t(0,"Du","du","PRON","sb",3),
+      t(1,"mir","ich","PRON","da",3,{"Case":["Dat"]}),
+      t(2,"einen","ein","DET","nk",3,{"Case":["Acc"]}),
+      t(3,"Gefallen","gefallen","NOUN","oa",4,{"Case":["Acc"]}),
+      t(4,"getan","tun","VERB","ROOT",None)
+    ]
+    matches=M.match(toks,pattern("nvv.gefallen_tun"))
+    assert matches
+    assert matches[0].negated is False
+    assert matches[0].negation_token_indices == []
