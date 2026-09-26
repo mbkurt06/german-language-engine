@@ -10,6 +10,9 @@ SEED_WORDS={
  "passieren":{"meanings":["olmak","meydana gelmek","bir yerden geçmek"]},
  "glauben":{"meanings":["inanmak","sanmak"]},"nehmen":{"meanings":["almak"]},
  "tun":{"meanings":["yapmak","etmek"]},"interessieren":{"meanings":["ilgilendirmek","ilgilenmek"]},
+ "bekommen":{"meanings":["almak","elde etmek","edinmek"]},
+ "rundfunkanstaltung":{"meanings":["yayın kuruluşu","radyo-televizyon kurumu"],"noun":("die","Rundfunkanstalt","Rundfunkanstalten")},
+ "was":{"meanings":["ne","neyi"]},"wir":{"meanings":["biz"]},
 }
 PRONOMINAL_USAGE={
  "damit":("bununla / bunu yaparak","mit","Önceden söylenen bir nesneye, olaya veya duruma tekrar ad vermeden gönderme yapar."),
