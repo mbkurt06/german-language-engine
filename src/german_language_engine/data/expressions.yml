@@ -194,3 +194,15 @@
   slots:
     - {id: wert, type: LEMMA, lemma: Wert}
     - {id: auf, type: PREPOSITION, prep: auf, case: [Acc]}
+
+
+- id: nvv.gefallen_tun
+  canonical: "jemandem einen Gefallen tun"
+  type: NOMEN_VERB
+  head_lemma: tun
+  priority: 92
+  meaning_tr: ["birine iyilik yapmak", "birinin işine yarayacak bir şey yapmak"]
+  grammar_hint: "+ Dat. · tun → getan"
+  cefr: B1
+  slots:
+    - {id: gefallen, type: LEMMA, lemma: Gefallen}
