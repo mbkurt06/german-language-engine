@@ -1,31 +1,26 @@
 # Hover contract — Context first, dictionary second
 
-The primary consumer is a subtitle/reader UI where a learner hovers one German token.
+Target clients are subtitle/readers such as ZDF, ARD and YouTube.
 
-## Display order
-1. **Expression/chunk first** — all relevant expressions containing the token, ranked by pedagogical specificity.
-2. **Meaning in this sentence** — contextual Turkish meaning.
-3. **Compact grammar hint** — e.g. `auf + Akk.`, `reflexiv`, `trennbar`, `Perfekt: ist passiert`.
-4. **Word meaning in context**.
-5. **Dictionary meanings** — secondary/collapsible.
+## Sentence level
+Analysis reserves `sentence_meaning_tr` for the natural contextual meaning of the complete sentence. Translation is a provider boundary so the structural engine remains reusable.
 
-## Nested analyses
-Overlap is not a reason to delete useful information. For `beim Kochen`, a UI may show both the concrete phrase and the productive grammar construction `beim + substantivierter Infinitiv`. The resolver ranks them instead of discarding one.
+## Hover order
+1. Expression/chunk and its contextual meaning.
+2. Compact grammar/use hint.
+3. Word meaning in this sentence.
+4. Lexical form: nouns show article + singular + plural; verbs can expose principal parts.
+5. Other dictionary meanings, collapsed by default.
 
-## Example
-Hovering `Rücksicht` in `Darauf müssen wir Rücksicht nehmen.` should conceptually produce:
+## Context-sensitive function words
+Pronominal adverbs such as `damit`, `darauf`, `davon`, `daran` and `dafür` expose their current meaning and a short `da(r)+preposition` explanation. The analyzer must distinguish pronominal-adverb `damit` from conjunction `damit` (= so that / in order that).
 
-```json
-{
-  "token": "Rücksicht",
-  "primary_expressions": [{
-    "canonical": "auf jemanden/etwas Rücksicht nehmen",
-    "meaning_tr": ["birini/bir şeyi dikkate almak"],
-    "grammar_hint": "auf + Akk."
-  }],
-  "contextual_word_meaning_tr": "birini/bir şeyi dikkate almak",
-  "dictionary_meanings_tr": ["dikkat", "özen", "göz önünde bulundurma"]
-}
-```
+## Target example
+For `Nein, damit hast du mir keinen Gefallen getan.` prioritize:
+- sentence meaning: Hayır, bunu yaparak bana iyilik etmiş olmadın.
+- `jemandem einen Gefallen tun` -> birine iyilik yapmak; + Dativ
+- `damit` -> bununla / bunu yaparak; `da(r)+mit`; reference to a previous action/situation
+- `der Gefallen · die Gefallen` -> iyilik, jest
+- `tun -> getan` as the verb inside the expression.
 
-The UI remains short; deeper dictionary/grammar detail is available only on demand.
+Expanded lexical/dictionary detail stays optional.
