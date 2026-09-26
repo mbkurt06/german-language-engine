@@ -10,6 +10,7 @@ PRONOMINAL_ADVERBS = {
     "davor":"vor","wovor":"vor","dahinter":"hinter","darunter":"unter","darum":"um","worum":"um",
 }
 ARTICLES = {"der","die","das","den","dem","des","ein","eine","einen","einem","einer","eines"}
+NEGATION_LEMMAS = {"nicht", "kein"}
 
 @dataclass
 class SlotHit:
@@ -52,12 +53,27 @@ class StructuralMatcher:
             surface=" ".join(tokens[i].text for i in indices)
             locality=sum(1 for h in hits if "dependency" in h.evidence)
             confidence=min(.99, .72 + .04*len(hits) + .03*locality)
+            negation_indices=self._negation_indices(tokens, head, indices, domain)
             matches.append(ExpressionMatch(
                 pattern_id=pattern.id, canonical=pattern.canonical, type=pattern.type,
                 meaning_tr=pattern.meaning_tr, token_indices=indices, surface=surface,
                 confidence=confidence, evidence=[h.evidence for h in hits],
+                negated=bool(negation_indices), negation_token_indices=negation_indices,
             ))
         return matches
+
+    def _negation_indices(self, tokens:list[Token], head:Token, matched:list[int], domain:set[int]) -> list[int]:
+        matched_set=set(matched)
+        negated=[]
+        for token in tokens:
+            if token.lemma.lower() not in NEGATION_LEMMAS:
+                continue
+            if token.head==head.i or token.i in domain:
+                negated.append(token.i)
+                continue
+            if token.head in matched_set:
+                negated.append(token.i)
+        return sorted(set(negated))
 
     def _slot(self, tokens:list[Token], head:Token, slot:Slot, used:set[int], domain:set[int]) -> SlotHit|None:
         pool=[t for t in tokens if t.i not in used]
