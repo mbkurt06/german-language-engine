@@ -58,6 +58,10 @@ def test_gefallen_tun_detects_keinen_as_negation():
     assert matches
     assert matches[0].negated is True
     assert matches[0].negation_token_indices == [6]
+    recipient=next(slot for slot in matches[0].bound_slots if slot.slot_id=="recipient")
+    assert recipient.token_indices == [5]
+    assert recipient.surface == "mir"
+    assert recipient.case == ["Dat"]
 
 
 def test_gefallen_tun_positive_is_not_negated():
