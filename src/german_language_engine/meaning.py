@@ -19,15 +19,30 @@ PRONOMINAL_USAGE={
  "dafür":("bunun için / buna karşılık","für","Önceden söylenen bir şeye veya duruma 'für' ilişkisiyle gönderme yapar."),
 }
 class MeaningResolver:
- def resolve_expression_meanings(self,expressions:list[ExpressionMatch])->None:
+ def resolve_expression_meanings(self,tokens:list[Token],expressions:list[ExpressionMatch])->None:
+  token_map={token.i:token for token in tokens}
   for expression in expressions:
    base=expression.meaning_tr[0] if expression.meaning_tr else None
+   base=self._realize_bound_slots(base,expression,token_map) if base else base
    if not base:
     expression.contextual_meaning_tr=None
    elif expression.negated:
     expression.contextual_meaning_tr=self._negate_tr(base)
    else:
     expression.contextual_meaning_tr=base
+
+ def _realize_bound_slots(self,meaning:str,expression:ExpressionMatch,token_map:dict[int,Token])->str:
+  recipient=next((slot for slot in expression.bound_slots if slot.slot_id=="recipient"),None)
+  if recipient and recipient.token_indices:
+   token=token_map.get(recipient.token_indices[0])
+   if token:
+    dative={
+     "mir":"bana","dir":"sana","ihm":"ona","ihr":"ona","uns":"bize","euch":"size","ihnen":"onlara","Ihnen":"size",
+    }.get(token.text, None) or {
+     "ich":"bana","du":"sana","er":"ona","sie":"ona","es":"ona","wir":"bize","ihr":"size",
+    }.get(token.lemma.lower())
+    if dative and meaning.startswith("birine "): return dative+" "+meaning[len("birine "):]
+  return meaning
 
  def _negate_tr(self,meaning:str)->str:
   replacements=((" yapmak"," yapmamak"),(" etmek"," etmemek"),(" olmak"," olmamak"),(" almak"," almamak"),(" vermek"," vermemek"))
@@ -36,7 +51,7 @@ class MeaningResolver:
   return f"{meaning} (olumsuz)"
 
  def word_meanings(self,tokens:list[Token],expressions:list[ExpressionMatch])->list[TokenMeaning]:
-  self.resolve_expression_meanings(expressions)
+  self.resolve_expression_meanings(tokens,expressions)
   by_token={}
   for expression in expressions:
    for index in expression.token_indices: by_token.setdefault(index,[]).append(expression)
