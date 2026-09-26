@@ -20,7 +20,7 @@ def m(pid, typ, idx):
     )
 
 
-def test_long_specific_expression_wins_overlap():
+def test_nested_useful_expressions_are_preserved_and_ranked():
     patterns = {
         "idiom": p("idiom", ExpressionType.IDIOM, 90),
         "verb": p("verb", ExpressionType.VERB_PREPOSITION, 50),
@@ -32,4 +32,6 @@ def test_long_specific_expression_wins_overlap():
         ],
         patterns,
     )
-    assert [x.pattern_id for x in out] == ["idiom"]
+    assert {item.pattern_id for item in out} == {"idiom", "verb"}
+    hover = MatchResolver().for_token(2, out)
+    assert hover[0].pattern_id == "idiom"
