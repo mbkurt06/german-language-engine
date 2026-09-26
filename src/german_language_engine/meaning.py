@@ -76,6 +76,15 @@ class MeaningResolver:
    if meaning.endswith(positive): return meaning[:-len(positive)]+negative
   return f"{meaning} (olumsuz)"
 
+ def _pluralize_tr(self,meaning:str)->str:
+  word=meaning.strip()
+  if not word or " " in word or word.endswith(("lar","ler")): return meaning
+  back_vowels=set("aıou")
+  front_vowels=set("eiöü")
+  vowels=[char for char in word.lower() if char in back_vowels|front_vowels]
+  if not vowels: return meaning
+  return word+("lar" if vowels[-1] in back_vowels else "ler")
+
  def word_meanings(self,tokens:list[Token],expressions:list[ExpressionMatch])->list[TokenMeaning]:
   self.resolve_expression_meanings(tokens,expressions)
   by_token={}
@@ -89,6 +98,8 @@ class MeaningResolver:
     if fallback: dictionary=[fallback]
    related=sorted(by_token.get(token.i,[]),key=lambda item:item.rank,reverse=True)
    contextual=(related[0].contextual_meaning_tr or (related[0].meaning_tr[0] if related[0].meaning_tr else None)) if related else (dictionary[0] if dictionary else None)
+   if not related and contextual and token.pos in {"NOUN","PROPN"} and "Plur" in token.morph.get("Number",[]):
+    contextual=self._pluralize_tr(contextual)
    lexical=None
    if "noun" in entry:
     article,singular,plural=entry["noun"]; lexical=LexicalForm(article=article,singular=singular,plural=plural)
