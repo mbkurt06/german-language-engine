@@ -25,6 +25,7 @@
   head_lemma: nehmen
   priority: 90
   meaning_tr: ["birini/bir şeyi dikkate almak", "göz önünde bulundurmak"]
+  grammar_hint: "auf + Akk."
   cefr: B2
   slots:
     - {id: ruecksicht, type: LEMMA, lemma: Rücksicht}
@@ -36,6 +37,7 @@
   head_lemma: interessieren
   priority: 90
   meaning_tr: ["biriyle/bir şeyle ilgilenmek"]
+  grammar_hint: "reflexiv · für + Akk."
   cefr: A2
   slots:
     - {id: reflexive, type: REFLEXIVE}
@@ -47,6 +49,7 @@
   head_lemma: abhängen
   priority: 85
   meaning_tr: ["birine/bir şeye bağlı olmak"]
+  grammar_hint: "von + Dat. · trennbar"
   cefr: B1
   slots:
     - {id: von, type: PREPOSITION, prep: von, case: [Dat]}
@@ -112,6 +115,7 @@
   head_lemma: warten
   priority: 80
   meaning_tr: ["birini/bir şeyi beklemek"]
+  grammar_hint: "auf + Akk."
   cefr: A1
   slots:
     - {id: auf, type: PREPOSITION, prep: auf, case: [Acc]}
