@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from .models import ExpressionMatch, ExpressionPattern, Slot, SlotType, Token
+from .models import BoundSlot, ExpressionMatch, ExpressionPattern, Slot, SlotType, Token
 
 REFLEXIVES = {"mich","mir","dich","dir","sich","uns","euch"}
 PRONOMINAL_ADVERBS = {
@@ -54,11 +54,13 @@ class StructuralMatcher:
             locality=sum(1 for h in hits if "dependency" in h.evidence)
             confidence=min(.99, .72 + .04*len(hits) + .03*locality)
             negation_indices=self._negation_indices(tokens, head, indices, domain)
+            bound_slots=[BoundSlot(slot_id=h.slot.id,token_indices=h.indices,surface=" ".join(tokens[i].text for i in h.indices),case=h.slot.case) for h in hits]
             matches.append(ExpressionMatch(
                 pattern_id=pattern.id, canonical=pattern.canonical, type=pattern.type,
                 meaning_tr=pattern.meaning_tr, token_indices=indices, surface=surface,
                 confidence=confidence, evidence=[h.evidence for h in hits],
                 negated=bool(negation_indices), negation_token_indices=negation_indices,
+                bound_slots=bound_slots,
             ))
         return matches
 
