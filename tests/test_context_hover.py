@@ -84,3 +84,36 @@ def test_so_prefers_contextual_turkish_meaning_boyle():
  item=MeaningResolver().word_meanings(tokens,[])[0]
  assert item.contextual_meaning_tr=="böyle"
  assert item.dictionary_meanings_tr[0]=="böyle"
+
+
+def test_function_words_use_contextual_meaning_before_dictionary_fallback():
+ tokens=[
+  Token(i=0,text="so",lemma="so",pos="ADV"),
+  Token(i=1,text="mit",lemma="mit",pos="ADP",morph={"Case":["Dat"]}),
+  Token(i=2,text="auf",lemma="auf",pos="ADP",morph={"Case":["Acc"]}),
+  Token(i=3,text="mir",lemma="ich",pos="PRON",morph={"Case":["Dat"],"Number":["Sing"]}),
+ ]
+ meanings=MeaningResolver().word_meanings(tokens,[])
+ assert meanings[0].contextual_meaning_tr.startswith("böyle")
+ assert meanings[1].contextual_meaning_tr=="ile / birlikte"
+ assert meanings[2].contextual_meaning_tr=="üzerine / -e"
+ assert meanings[3].contextual_meaning_tr=="bana"
+
+
+def test_expression_meaning_still_beats_generic_preposition_meaning():
+ tokens=[
+  Token(i=0,text="über",lemma="über",pos="ADP",morph={"Case":["Acc"]}),
+  Token(i=1,text="sprechen",lemma="sprechen",pos="VERB"),
+ ]
+ expression=ExpressionMatch(
+  pattern_id="vp.sprechen_ueber",
+  canonical="über jemanden/etwas sprechen",
+  type=ExpressionType.VERB_PREPOSITION,
+  meaning_tr=["biri/bir şey hakkında konuşmak"],
+  token_indices=[0,1],
+  surface="über sprechen",
+  confidence=.95,
+  rank=100,
+ )
+ meanings=MeaningResolver().word_meanings(tokens,[expression])
+ assert meanings[0].contextual_meaning_tr=="biri/bir şey hakkında konuşmak"
