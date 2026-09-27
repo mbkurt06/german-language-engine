@@ -59,6 +59,12 @@ SEED_WORDS={
  "über":{"meanings":["hakkında","üzerinde","üzerinden"]},
  "bei":{"meanings":["yanında","-de/-da","nezdinde (bağlama göre)"]},
  "bedanken":{"meanings":["teşekkür etmek"]},
+ "aussehen":{"meanings":["görünmek","gibi görünmek"]},
+ "aufstehen":{"meanings":["ayağa kalkmak","yataktan kalkmak"]},
+ "anfangen":{"meanings":["başlamak"]},
+ "ankommen":{"meanings":["varmak","gelip ulaşmak"]},
+ "mitmachen":{"meanings":["katılmak","birlikte yapmak"]},
+ "weitergehen":{"meanings":["devam etmek","ilerlemeye devam etmek"]},
 }
 PRONOMINAL_USAGE={
  "damit":("bununla / bunu yaparak","mit","Önceden söylenen bir nesneye, olaya veya duruma tekrar ad vermeden gönderme yapar."),
@@ -71,6 +77,14 @@ LEXICAL_PROVIDER_POS={"NOUN","PROPN","VERB","ADJ","ADV"}
 class MeaningResolver:
  def __init__(self,lexical_provider:TranslationProvider|None=None):
   self.lexical_provider=lexical_provider or NullTranslationProvider()
+
+ def lexical_meanings(self,lemma:str,pos:str="VERB")->list[str]:
+  entry=SEED_WORDS.get(lemma.lower(),{})
+  dictionary=list(entry.get("meanings",[]))
+  if not dictionary and pos in LEXICAL_PROVIDER_POS:
+   fallback=self.lexical_provider.translate(lemma)
+   if fallback: dictionary=[fallback]
+  return dictionary
 
  def resolve_expression_meanings(self,tokens:list[Token],expressions:list[ExpressionMatch])->None:
   token_map={token.i:token for token in tokens}
@@ -137,10 +151,7 @@ class MeaningResolver:
    for index in expression.token_indices: by_token.setdefault(index,[]).append(expression)
   output=[]
   for token in tokens:
-   entry=SEED_WORDS.get(token.lemma.lower(),{}); dictionary=list(entry.get("meanings",[]))
-   if not dictionary and token.pos in LEXICAL_PROVIDER_POS:
-    fallback=self.lexical_provider.translate(token.lemma)
-    if fallback: dictionary=[fallback]
+   entry=SEED_WORDS.get(token.lemma.lower(),{}); dictionary=self.lexical_meanings(token.lemma,token.pos)
    related=sorted(by_token.get(token.i,[]),key=lambda item:item.rank,reverse=True)
    contextual=(related[0].contextual_meaning_tr or (related[0].meaning_tr[0] if related[0].meaning_tr else None)) if related else (dictionary[0] if dictionary else None)
    lexical=None
