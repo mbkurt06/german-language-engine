@@ -241,3 +241,27 @@
   cefr: B1
   slots:
     - {id: auf, type: PARTICLE, lemma: auf}
+
+
+- id: vp.sprechen_ueber
+  canonical: "über jemanden/etwas sprechen"
+  type: VERB_PREPOSITION
+  head_lemma: sprechen
+  priority: 88
+  meaning_tr: ["biri/bir şey hakkında konuşmak"]
+  grammar_hint: "über + Akk."
+  cefr: A2
+  slots:
+    - {id: ueber, type: PREPOSITION, prep: über, case: [Acc]}
+
+- id: reflexiv.bedanken_bei
+  canonical: "sich bei jemandem bedanken"
+  type: REFLEXIVE_VERB_PREPOSITION
+  head_lemma: bedanken
+  priority: 92
+  meaning_tr: ["birine teşekkür etmek"]
+  grammar_hint: "reflexiv · bei + Dat."
+  cefr: A2
+  slots:
+    - {id: reflexive, type: REFLEXIVE, optional: true}
+    - {id: bei, type: PREPOSITION, prep: bei, case: [Dat]}
