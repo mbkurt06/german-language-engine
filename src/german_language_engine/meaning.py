@@ -49,6 +49,13 @@ SEED_WORDS={
  "verbessern":{"meanings":["iyileştirmek","geliştirmek"]},
  "finden":{"meanings":["bulmak"]},
  "lernen":{"meanings":["öğrenmek"]},
+ "kauf":{"meanings":["satın alma","alış"] ,"noun":("der","Kauf","Käufe")},
+ "vertun":{"meanings":["boşa harcamak","yanlış kullanmak"]},
+ "verschieben":{"meanings":["ertelemek","kaydırmak","yerini değiştirmek"]},
+ "aufschieben":{"meanings":["ertelemek","sonraya bırakmak"]},
+ "auf":{"meanings":["üzerinde","üzerine","-e/-a (bağlama göre)"]},
+ "in":{"meanings":["içinde","içine","-de/-da (bağlama göre)"]},
+ "sich":{"meanings":["kendini / kendisine (dönüşlü zamir)"]},
 }
 PRONOMINAL_USAGE={
  "damit":("bununla / bunu yaparak","mit","Önceden söylenen bir nesneye, olaya veya duruma tekrar ad vermeden gönderme yapar."),
