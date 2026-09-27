@@ -119,3 +119,34 @@ def test_verschieben_auf_marks_preposition_and_verb_together():
     assert 1 in matches[0].token_indices
     assert 4 in matches[0].token_indices
     assert matches[0].meaning_tr[0].startswith("bir şeyi")
+
+
+def test_sprechen_ueber_marks_preposition_and_verb_together():
+    toks=[
+      t(0,"Wir","wir","PRON","sb",4),
+      t(1,"wollen","wollen","AUX","aux",4),
+      t(2,"über","über","ADP","mo",4),
+      t(3,"das","das","DET","nk",4,{"Case":["Acc"]}),
+      t(4,"Wort","Wort","NOUN","oa",5,{"Case":["Acc"]}),
+      t(5,"sprechen","sprechen","VERB","ROOT",None),
+    ]
+    matches=M.match(toks,pattern("vp.sprechen_ueber"))
+    assert matches
+    assert 2 in matches[0].token_indices
+    assert 5 in matches[0].token_indices
+    assert matches[0].canonical == "über jemanden/etwas sprechen"
+
+
+def test_bedanken_bei_matches_even_if_reflexive_is_in_previous_caption():
+    toks=[
+      t(0,"noch","noch","ADV","mo",4),
+      t(1,"bei","bei","ADP","mo",4),
+      t(2,"unserem","unser","DET","nk",3,{"Case":["Dat"]}),
+      t(3,"Sponsor","Sponsor","NOUN","nk",1,{"Case":["Dat"]}),
+      t(4,"bedanken","bedanken","VERB","ROOT",None),
+    ]
+    matches=M.match(toks,pattern("reflexiv.bedanken_bei"))
+    assert matches
+    assert 1 in matches[0].token_indices
+    assert 4 in matches[0].token_indices
+    assert matches[0].canonical == "sich bei jemandem bedanken"
