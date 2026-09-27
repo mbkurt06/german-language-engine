@@ -77,3 +77,10 @@ def test_observed_subtitle_words_have_lexical_fallback():
  assert meanings[1].contextual_meaning_tr=="yayın kuruluşu"
  assert meanings[1].lexical_form.article=="die"
  assert meanings[1].lexical_form.plural=="Rundfunkanstalten"
+
+
+def test_so_prefers_contextual_turkish_meaning_boyle():
+ tokens=[Token(i=0,text="so",lemma="so",pos="ADV")]
+ item=MeaningResolver().word_meanings(tokens,[])[0]
+ assert item.contextual_meaning_tr=="böyle"
+ assert item.dictionary_meanings_tr[0]=="böyle"
