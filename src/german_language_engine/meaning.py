@@ -66,6 +66,7 @@ SEED_WORDS={
  "ankommen":{"meanings":["varmak","gelip ulaşmak"]},
  "mitmachen":{"meanings":["katılmak","birlikte yapmak"]},
  "weitergehen":{"meanings":["devam etmek","ilerlemeye devam etmek"]},
+ "gehen":{"meanings":["gitmek"]},
 }
 PRONOMINAL_USAGE={
  "damit":("bununla / bunu yaparak","mit","Önceden söylenen bir nesneye, olaya veya duruma tekrar ad vermeden gönderme yapar."),
@@ -219,7 +220,8 @@ class MeaningResolver:
   entry=SEED_WORDS.get(lemma.lower(),{})
   dictionary=list(entry.get("meanings",[]))
   if not dictionary and pos in LEXICAL_PROVIDER_POS:
-   fallback=self.lexical_provider.translate(lemma)
+   lexical_translate=getattr(self.lexical_provider,"translate_lexeme",None)
+   fallback=lexical_translate(lemma,pos) if callable(lexical_translate) else self.lexical_provider.translate(lemma)
    if fallback: dictionary=[fallback]
   return dictionary
 
