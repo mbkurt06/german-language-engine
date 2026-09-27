@@ -12,8 +12,16 @@ class ExpressionLexicon:
 
     @classmethod
     def bundled(cls) -> "ExpressionLexicon":
-        path = files("german_language_engine").joinpath("data/expressions.yml")
-        return cls.from_yaml(path.read_text(encoding="utf-8"))
+        data_dir = files("german_language_engine").joinpath("data")
+        patterns: list[ExpressionPattern] = []
+        for path in sorted(
+            (item for item in data_dir.iterdir() if item.name.endswith(".yml")),
+            key=lambda item: item.name,
+        ):
+            raw = path.read_text(encoding="utf-8")
+            data = yaml.safe_load(raw) or []
+            patterns.extend(ExpressionPattern.model_validate(item) for item in data)
+        return cls(patterns)
 
     @classmethod
     def from_yaml(cls, raw: str) -> "ExpressionLexicon":
