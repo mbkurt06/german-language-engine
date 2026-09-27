@@ -75,6 +75,82 @@ PRONOMINAL_USAGE={
  "dafür":("bunun için / buna karşılık","für","Önceden söylenen bir şeye veya duruma 'für' ilişkisiyle gönderme yapar."),
 }
 LEXICAL_PROVIDER_POS={"NOUN","PROPN","VERB","ADJ","ADV"}
+
+FUNCTION_WORD_MEANINGS={
+ "ADV":{
+  "so":"böyle / öyle / bu şekilde",
+  "noch":"hâlâ / daha / ayrıca (bağlama göre)",
+  "schon":"zaten / çoktan / şimdiden (bağlama göre)",
+  "erst":"ancak / daha yeni / önce (bağlama göre)",
+  "doch":"ama / yine de / aslında (bağlama göre)",
+  "mal":"bir kez / biraz (konuşma dilinde, bağlama göre)",
+  "eben":"işte / tam da / az önce (bağlama göre)",
+  "gerade":"şu anda / tam / az önce (bağlama göre)",
+  "dann":"sonra / o zaman",
+  "da":"orada / bu durumda / çünkü (bağlama göre)",
+  "also":"yani / o hâlde",
+  "wohl":"muhtemelen / herhalde",
+  "nur":"sadece / yalnızca",
+  "auch":"de / da / ayrıca",
+  "wieder":"yeniden / tekrar",
+  "immer":"her zaman / sürekli",
+  "wirklich":"gerçekten",
+  "eigentlich":"aslında",
+  "vielleicht":"belki",
+  "natürlich":"elbette / doğal olarak",
+ },
+ "PART":{
+  "doch":"ama / yine de / vurgu (bağlama göre)",
+  "mal":"bir kez / biraz (konuşma dilinde)",
+  "eben":"işte / tam da",
+  "ja":"evet / bilindiği gibi / vurgu (bağlama göre)",
+  "wohl":"herhalde / muhtemelen",
+  "nur":"sadece / yalnızca",
+ },
+}
+
+PREPOSITION_MEANINGS={
+ "mit":"ile / birlikte",
+ "bei":"yanında / -de/-da / sırasında (bağlama göre)",
+ "von":"-den/-dan / tarafından / hakkında (bağlama göre)",
+ "zu":"-e/-a / yanında / için (bağlama göre)",
+ "für":"için",
+ "ohne":"-sız/-siz / olmadan",
+ "gegen":"karşı / yaklaşık",
+ "durch":"içinden / aracılığıyla",
+ "aus":"-den/-dan / içinden",
+ "nach":"-e/-a doğru / sonra / göre (bağlama göre)",
+ "seit":"-den beri",
+ "ab":"itibaren",
+ "bis":"-e kadar",
+ "um":"etrafında / saat / için (bağlama göre)",
+ "wegen":"nedeniyle / yüzünden",
+ "trotz":"-e rağmen",
+}
+
+TWO_WAY_PREPOSITIONS={
+ "in":{"Acc":"içine / -e", "Dat":"içinde / -de"},
+ "an":{"Acc":"-e / yanına / üzerine", "Dat":"-de / yanında / üzerinde"},
+ "auf":{"Acc":"üzerine / -e", "Dat":"üzerinde"},
+ "über":{"Acc":"üzerine / üzerinden / hakkında", "Dat":"üzerinde / hakkında"},
+ "unter":{"Acc":"altına / arasına", "Dat":"altında / arasında"},
+ "vor":{"Acc":"önüne", "Dat":"önünde / önce"},
+ "hinter":{"Acc":"arkasına", "Dat":"arkasında"},
+ "neben":{"Acc":"yanına", "Dat":"yanında"},
+ "zwischen":{"Acc":"arasına", "Dat":"arasında"},
+}
+
+PRONOUN_CASE_MEANINGS={
+ "ich":{"Nom":"ben","Acc":"beni","Dat":"bana"},
+ "du":{"Nom":"sen","Acc":"seni","Dat":"sana"},
+ "er":{"Nom":"o","Acc":"onu","Dat":"ona"},
+ "sie":{"Nom":"o / onlar","Acc":"onu / onları","Dat":"ona / onlara"},
+ "es":{"Nom":"o","Acc":"onu","Dat":"ona"},
+ "wir":{"Nom":"biz","Acc":"bizi","Dat":"bize"},
+ "ihr":{"Nom":"siz","Acc":"sizi","Dat":"size"},
+ "sie_pl":{"Nom":"onlar","Acc":"onları","Dat":"onlara"},
+}
+
 class MeaningResolver:
  def __init__(self,lexical_provider:TranslationProvider|None=None):
   self.lexical_provider=lexical_provider or NullTranslationProvider()
@@ -136,6 +212,29 @@ class MeaningResolver:
    if meaning.endswith(positive): return meaning[:-len(positive)]+negative
   return f"{meaning} (olumsuz)"
 
+ def _contextual_function_meaning(self,token:Token)->str|None:
+  lemma=token.lemma.lower()
+  low=token.text.lower()
+  case=(token.morph.get("Case") or [None])[0]
+
+  if token.pos=="ADP":
+   if lemma in TWO_WAY_PREPOSITIONS:
+    return TWO_WAY_PREPOSITIONS[lemma].get(case) or " / ".join(TWO_WAY_PREPOSITIONS[lemma].values())
+   return PREPOSITION_MEANINGS.get(lemma) or PREPOSITION_MEANINGS.get(low)
+
+  if token.pos in {"ADV","PART"}:
+   return FUNCTION_WORD_MEANINGS.get(token.pos,{}).get(lemma) or FUNCTION_WORD_MEANINGS.get(token.pos,{}).get(low)
+
+  if token.pos=="PRON":
+   base=lemma
+   if low in {"sie","ihnen"} and "Plur" in token.morph.get("Number",[]):
+    base="sie_pl"
+   forms=PRONOUN_CASE_MEANINGS.get(base)
+   if forms:
+    return forms.get(case) or forms.get("Nom")
+
+  return None
+
  def _pluralize_tr(self,meaning:str)->str:
   word=meaning.strip()
   if not word or " " in word or word.endswith(("lar","ler")): return meaning
@@ -154,7 +253,8 @@ class MeaningResolver:
   for token in tokens:
    entry=SEED_WORDS.get(token.lemma.lower(),{}); dictionary=self.lexical_meanings(token.lemma,token.pos)
    related=sorted(by_token.get(token.i,[]),key=lambda item:item.rank,reverse=True)
-   contextual=(related[0].contextual_meaning_tr or (related[0].meaning_tr[0] if related[0].meaning_tr else None)) if related else (dictionary[0] if dictionary else None)
+   function_context=self._contextual_function_meaning(token)
+   contextual=(related[0].contextual_meaning_tr or (related[0].meaning_tr[0] if related[0].meaning_tr else None)) if related else (function_context or (dictionary[0] if dictionary else None))
    lexical=None
    noun_forms=entry.get("noun")
    if noun_forms:
