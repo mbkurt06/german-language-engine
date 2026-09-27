@@ -66,9 +66,9 @@ def test_lexical_provider_is_not_used_for_function_words():
 
     result = engine.analyze("ist eine große Dummheit")
 
-    assert result.hover[0].contextual_word_meaning_tr is None
+    assert result.hover[0].contextual_word_meaning_tr == "olmak"
     assert result.hover[0].dictionary_meanings_tr == []
-    assert result.hover[1].contextual_word_meaning_tr is None
+    assert result.hover[1].contextual_word_meaning_tr == "bir / belirsiz tanımlık"
     assert result.hover[1].dictionary_meanings_tr == []
     assert result.hover[2].contextual_word_meaning_tr == "büyük"
     assert result.hover[3].contextual_word_meaning_tr == "aptallık"
