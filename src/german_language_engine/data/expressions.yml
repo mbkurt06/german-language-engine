@@ -207,3 +207,37 @@
   slots:
     - {id: recipient, type: OBJECT, case: [Dat]}
     - {id: gefallen, type: LEMMA, lemma: Gefallen}
+
+
+- id: reflexiv.vertun
+  canonical: "sich vertun"
+  type: REFLEXIVE_VERB
+  head_lemma: vertun
+  priority: 92
+  meaning_tr: ["yanılmak", "hata yapmak"]
+  grammar_hint: "reflexiv · sich + vertun"
+  cefr: B1
+  slots:
+    - {id: reflexive, type: REFLEXIVE}
+
+- id: vp.verschieben_auf
+  canonical: "etwas auf einen Zeitpunkt/Termin verschieben"
+  type: VERB_PREPOSITION
+  head_lemma: verschieben
+  priority: 88
+  meaning_tr: ["bir şeyi başka bir zamana/tarihe ertelemek", "bir şeyi ... tarihine kaydırmak"]
+  grammar_hint: "auf + Akk."
+  cefr: B1
+  slots:
+    - {id: auf, type: PREPOSITION, prep: auf, case: [Acc]}
+
+- id: verb.aufschieben
+  canonical: "etwas aufschieben"
+  type: COLLOCATION
+  head_lemma: aufschieben
+  priority: 86
+  meaning_tr: ["bir şeyi ertelemek", "sonraya bırakmak"]
+  grammar_hint: "trennbar · schiebt ... auf"
+  cefr: B1
+  slots:
+    - {id: auf, type: PARTICLE, lemma: auf}
