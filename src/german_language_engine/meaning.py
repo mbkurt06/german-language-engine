@@ -78,7 +78,7 @@ LEXICAL_PROVIDER_POS={"NOUN","PROPN","VERB","ADJ","ADV"}
 
 FUNCTION_WORD_MEANINGS={
  "ADV":{
-  "so":"böyle / öyle / bu şekilde",
+  "so":"böyle",
   "noch":"hâlâ / daha / ayrıca (bağlama göre)",
   "schon":"zaten / çoktan / şimdiden (bağlama göre)",
   "erst":"ancak / daha yeni / önce (bağlama göre)",
