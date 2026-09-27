@@ -74,7 +74,7 @@ PRONOMINAL_USAGE={
  "daran":("buna / bunda","an","Önceden söylenen bir şeye veya duruma 'an' ilişkisiyle gönderme yapar."),
  "dafür":("bunun için / buna karşılık","für","Önceden söylenen bir şeye veya duruma 'für' ilişkisiyle gönderme yapar."),
 }
-LEXICAL_PROVIDER_POS={"NOUN","PROPN","VERB","ADJ","ADV","AUX","ADP","PRON","DET","SCONJ","CCONJ","PART"}
+LEXICAL_PROVIDER_POS={"NOUN","PROPN","VERB","ADJ","ADV"}
 
 FUNCTION_WORD_MEANINGS={
  "ADV":{
@@ -98,6 +98,11 @@ FUNCTION_WORD_MEANINGS={
   "eigentlich":"aslında",
   "vielleicht":"belki",
   "natürlich":"elbette / doğal olarak",
+ },
+ "AUX":{
+  "sein":"olmak",
+  "haben":"sahip olmak / yardımcı fiil olarak Perfekt kurmak",
+  "werden":"olmak / olacak / edilgen yapı kurmak (bağlama göre)",
  },
  "PART":{
   "doch":"ama / yine de / vurgu (bağlama göre)",
@@ -277,7 +282,7 @@ class MeaningResolver:
     return TWO_WAY_PREPOSITIONS[lemma].get(case) or " / ".join(TWO_WAY_PREPOSITIONS[lemma].values())
    return PREPOSITION_MEANINGS.get(lemma) or PREPOSITION_MEANINGS.get(low)
 
-  if token.pos in {"ADV","PART","SCONJ","CCONJ"}:
+  if token.pos in {"ADV","AUX","PART","SCONJ","CCONJ"}:
    return FUNCTION_WORD_MEANINGS.get(token.pos,{}).get(lemma) or FUNCTION_WORD_MEANINGS.get(token.pos,{}).get(low)
 
   if token.pos=="DET":
