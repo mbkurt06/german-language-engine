@@ -117,3 +117,21 @@ def test_expression_meaning_still_beats_generic_preposition_meaning():
  )
  meanings=MeaningResolver().word_meanings(tokens,[expression])
  assert meanings[0].contextual_meaning_tr=="biri/bir şey hakkında konuşmak"
+
+
+def test_bevor_has_contextual_meaning_and_grammar_role():
+ tokens=[Token(i=0,text="bevor",lemma="bevor",pos="SCONJ",dep="cp")]
+ item=MeaningResolver().word_meanings(tokens,[])[0]
+ assert item.contextual_meaning_tr=="önce / -meden önce"
+ assert any(note.kind=="GRAMMAR_ROLE" for note in item.usage_notes)
+ assert any("Yan cümleyi ana cümleye bağlar" in note.explanation_tr for note in item.usage_notes)
+
+
+def test_determiner_and_conjunction_have_contextual_fallbacks():
+ tokens=[
+  Token(i=0,text="und",lemma="und",pos="CCONJ"),
+  Token(i=1,text="der",lemma="der",pos="DET"),
+ ]
+ meanings=MeaningResolver().word_meanings(tokens,[])
+ assert meanings[0].contextual_meaning_tr=="ve"
+ assert "belirli" in meanings[1].contextual_meaning_tr
