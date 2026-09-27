@@ -107,6 +107,32 @@ FUNCTION_WORD_MEANINGS={
   "wohl":"herhalde / muhtemelen",
   "nur":"sadece / yalnızca",
  },
+ "SCONJ":{
+  "bevor":"önce / -meden önce",
+  "nachdem":"-dikten sonra",
+  "während":"-iken / sırasında",
+  "wenn":"eğer / -dığında",
+  "als":"-dığında / iken",
+  "weil":"çünkü",
+  "da":"çünkü / -dığı için",
+  "obwohl":"-mesine rağmen",
+  "ob":"olup olmadığını / acaba",
+  "dass":"-diğini / ki",
+  "damit":"-mesi için / böylece",
+  "bis":"-e kadar",
+  "seitdem":"-den beri",
+  "sobald":"-er ermez",
+  "solange":"-dığı sürece",
+  "falls":"eğer / olması hâlinde",
+ },
+ "CCONJ":{
+  "und":"ve",
+  "oder":"veya / ya da",
+  "aber":"ama / fakat",
+  "denn":"çünkü",
+  "sondern":"aksine / bilakis",
+  "doch":"ama / ancak",
+ },
 }
 
 PREPOSITION_MEANINGS={
@@ -138,6 +164,35 @@ TWO_WAY_PREPOSITIONS={
  "hinter":{"Acc":"arkasına", "Dat":"arkasında"},
  "neben":{"Acc":"yanına", "Dat":"yanında"},
  "zwischen":{"Acc":"arasına", "Dat":"arasında"},
+}
+
+DETERMINER_MEANINGS={
+ "der":"Türkçede ayrı karşılığı yok; ismi belirli yapar",
+ "die":"Türkçede ayrı karşılığı yok; ismi belirli yapar",
+ "das":"Türkçede ayrı karşılığı yok; ismi belirli yapar",
+ "ein":"bir / belirsiz tanımlık",
+ "eine":"bir / belirsiz tanımlık",
+ "kein":"hiçbir / değil",
+ "dies":"bu",
+ "jener":"şu / o",
+ "welch":"hangi",
+ "jed":"her",
+ "manch":"bazı",
+}
+
+POS_ROLE_TR={
+ "SCONJ":"Yan cümleyi ana cümleye bağlar.",
+ "CCONJ":"Eş düzeyde sözcükleri veya cümle ögelerini bağlar.",
+ "ADP":"İsim grubuyla birlikte yön, yer, zaman veya başka bir ilişki kurar.",
+ "DET":"İsmi belirler; belirlilik, belirsizlik veya çekim bilgisini taşır.",
+ "PRON":"Bir ismin veya isim grubunun yerini tutar.",
+ "AUX":"Ana fiilin zaman, kip veya çatı yapısını kurmaya yardımcı olur.",
+ "PART":"Cümlede vurgu, olumsuzluk veya fiil parçası gibi bir görev üstlenir.",
+ "ADV":"Fiili, sıfatı veya bütün cümleyi durum, zaman, derece vb. bakımından niteler.",
+ "ADJ":"Bir ismin niteliğini veya durumunu bildirir.",
+ "VERB":"Cümlenin eylem veya durum anlamını taşır.",
+ "NOUN":"Bir kişi, nesne, kavram veya durumu adlandırır.",
+ "PROPN":"Özel isimdir.",
 }
 
 PRONOUN_CASE_MEANINGS={
@@ -222,8 +277,11 @@ class MeaningResolver:
     return TWO_WAY_PREPOSITIONS[lemma].get(case) or " / ".join(TWO_WAY_PREPOSITIONS[lemma].values())
    return PREPOSITION_MEANINGS.get(lemma) or PREPOSITION_MEANINGS.get(low)
 
-  if token.pos in {"ADV","PART"}:
+  if token.pos in {"ADV","PART","SCONJ","CCONJ"}:
    return FUNCTION_WORD_MEANINGS.get(token.pos,{}).get(lemma) or FUNCTION_WORD_MEANINGS.get(token.pos,{}).get(low)
+
+  if token.pos=="DET":
+   return DETERMINER_MEANINGS.get(lemma) or DETERMINER_MEANINGS.get(low)
 
   if token.pos=="PRON":
    base=lemma
@@ -277,5 +335,8 @@ class MeaningResolver:
    if low in PRONOMINAL_USAGE:
     contextual,prep,explanation=PRONOMINAL_USAGE[low]
     notes.append(UsageNote(kind="PRONOMINAL_ADVERB",label=f"da(r) + {prep}",explanation_tr=explanation,source=low,refers_to="önceki nesne/olay/durum"))
+   role=POS_ROLE_TR.get(token.pos)
+   if role:
+    notes.append(UsageNote(kind="GRAMMAR_ROLE",label="Görevi",explanation_tr=role,source=token.pos))
    output.append(TokenMeaning(token_index=token.i,lemma=token.lemma,contextual_meaning_tr=contextual,dictionary_meanings_tr=dictionary,lexical_form=lexical,usage_notes=notes))
   return output
