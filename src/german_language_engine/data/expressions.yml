@@ -263,5 +263,5 @@
   grammar_hint: "reflexiv · bei + Dat."
   cefr: A2
   slots:
-    - {id: reflexive, type: REFLEXIVE, optional: true}
+    - {id: reflexive, type: REFLEXIVE}
     - {id: bei, type: PREPOSITION, prep: bei, case: [Dat]}
