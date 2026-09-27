@@ -74,7 +74,7 @@ PRONOMINAL_USAGE={
  "daran":("buna / bunda","an","Önceden söylenen bir şeye veya duruma 'an' ilişkisiyle gönderme yapar."),
  "dafür":("bunun için / buna karşılık","für","Önceden söylenen bir şeye veya duruma 'für' ilişkisiyle gönderme yapar."),
 }
-LEXICAL_PROVIDER_POS={"NOUN","PROPN","VERB","ADJ","ADV"}
+LEXICAL_PROVIDER_POS={"NOUN","PROPN","VERB","ADJ","ADV","AUX","ADP","PRON","DET","SCONJ","CCONJ","PART"}
 
 FUNCTION_WORD_MEANINGS={
  "ADV":{
