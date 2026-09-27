@@ -76,3 +76,46 @@ def test_gefallen_tun_positive_is_not_negated():
     assert matches
     assert matches[0].negated is False
     assert matches[0].negation_token_indices == []
+
+
+def test_in_kauf_nehmen_marks_in_kauf_and_nehmen_as_one_expression():
+    toks=[
+      t(0,"Wir","wir","PRON","sb",4),
+      t(1,"nehmen","nehmen","VERB","ROOT",None),
+      t(2,"das","das","PRON","oa",1),
+      t(3,"in","in","ADP","mo",4),
+      t(4,"Kauf","Kauf","NOUN","nk",1),
+    ]
+    matches=M.match(toks,pattern("idiom.in_kauf_nehmen"))
+    assert matches
+    assert set(matches[0].token_indices) == {1,3,4}
+    assert matches[0].meaning_tr[0] == "bir şeyi göze almak"
+
+
+def test_sich_vertun_marks_reflexive_and_verb_together():
+    toks=[
+      t(0,"Ich","ich","PRON","sb",2),
+      t(1,"habe","haben","AUX","aux",2),
+      t(2,"mich","sich","PRON","oa",3,{"Reflex":["Yes"]}),
+      t(3,"vertan","vertun","VERB","ROOT",None),
+    ]
+    matches=M.match(toks,pattern("reflexiv.vertun"))
+    assert matches
+    assert set(matches[0].token_indices) == {2,3}
+    assert matches[0].canonical == "sich vertun"
+
+
+def test_verschieben_auf_marks_preposition_and_verb_together():
+    toks=[
+      t(0,"Wir","wir","PRON","sb",1),
+      t(1,"verschieben","verschieben","VERB","ROOT",None),
+      t(2,"den","der","DET","nk",3,{"Case":["Acc"]}),
+      t(3,"Termin","Termin","NOUN","oa",1,{"Case":["Acc"]}),
+      t(4,"auf","auf","ADP","mo",1),
+      t(5,"Montag","Montag","NOUN","nk",4,{"Case":["Acc"]}),
+    ]
+    matches=M.match(toks,pattern("vp.verschieben_auf"))
+    assert matches
+    assert 1 in matches[0].token_indices
+    assert 4 in matches[0].token_indices
+    assert matches[0].meaning_tr[0].startswith("bir şeyi")
