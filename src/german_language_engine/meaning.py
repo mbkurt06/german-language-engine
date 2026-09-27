@@ -56,6 +56,9 @@ SEED_WORDS={
  "auf":{"meanings":["üzerinde","üzerine","-e/-a (bağlama göre)"]},
  "in":{"meanings":["içinde","içine","-de/-da (bağlama göre)"]},
  "sich":{"meanings":["kendini / kendisine (dönüşlü zamir)"]},
+ "über":{"meanings":["hakkında","üzerinde","üzerinden"]},
+ "bei":{"meanings":["yanında","-de/-da","nezdinde (bağlama göre)"]},
+ "bedanken":{"meanings":["teşekkür etmek"]},
 }
 PRONOMINAL_USAGE={
  "damit":("bununla / bunu yaparak","mit","Önceden söylenen bir nesneye, olaya veya duruma tekrar ad vermeden gönderme yapar."),
