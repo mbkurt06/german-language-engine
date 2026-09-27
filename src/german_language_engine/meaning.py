@@ -59,6 +59,7 @@ SEED_WORDS={
  "über":{"meanings":["hakkında","üzerinde","üzerinden"]},
  "bei":{"meanings":["yanında","-de/-da","nezdinde (bağlama göre)"]},
  "bedanken":{"meanings":["teşekkür etmek"]},
+ "so":{"meanings":["böyle","öyle","bu şekilde"]},
  "aussehen":{"meanings":["görünmek","gibi görünmek"]},
  "aufstehen":{"meanings":["ayağa kalkmak","yataktan kalkmak"]},
  "anfangen":{"meanings":["başlamak"]},
