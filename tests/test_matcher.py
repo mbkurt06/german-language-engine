@@ -137,16 +137,27 @@ def test_sprechen_ueber_marks_preposition_and_verb_together():
     assert matches[0].canonical == "über jemanden/etwas sprechen"
 
 
-def test_bedanken_bei_matches_even_if_reflexive_is_in_previous_caption():
-    toks=[
+def test_bedanken_bei_requires_full_reflexive_expression():
+    incomplete=[
       t(0,"noch","noch","ADV","mo",4),
       t(1,"bei","bei","ADP","mo",4),
       t(2,"unserem","unser","DET","nk",3,{"Case":["Dat"]}),
       t(3,"Sponsor","Sponsor","NOUN","nk",1,{"Case":["Dat"]}),
       t(4,"bedanken","bedanken","VERB","ROOT",None),
     ]
-    matches=M.match(toks,pattern("reflexiv.bedanken_bei"))
+    assert M.match(incomplete,pattern("reflexiv.bedanken_bei")) == []
+
+    complete=[
+      t(0,"mich","ich","PRON","oa",4,{"Reflex":["Yes"]}),
+      t(1,"noch","noch","ADV","mo",4),
+      t(2,"bei","bei","ADP","mo",4),
+      t(3,"unserem","unser","DET","nk",4,{"Case":["Dat"]}),
+      t(4,"Sponsor","Sponsor","NOUN","nk",2,{"Case":["Dat"]}),
+      t(5,"bedanken","bedanken","VERB","ROOT",None),
+    ]
+    matches=M.match(complete,pattern("reflexiv.bedanken_bei"))
     assert matches
-    assert 1 in matches[0].token_indices
-    assert 4 in matches[0].token_indices
+    assert 0 in matches[0].token_indices
+    assert 2 in matches[0].token_indices
+    assert 5 in matches[0].token_indices
     assert matches[0].canonical == "sich bei jemandem bedanken"
